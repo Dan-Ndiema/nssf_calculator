@@ -223,26 +223,20 @@ elif page == "Member Registration":
         if not member_id or not name or not id_number or not employer:
             st.error("Please fill in all fields before registering.")
         else:
-            member = register_member(member_id, name, id_number,
-                                     employer, salary, start_date)
+            member = register_member(member_id, name, id_number, employer, salary, start_date)
             new_row = pd.DataFrame([member])
 
             try:
-                existing = pd.read_excel("nssf_records.xlsx",
-                                         sheet_name="Members")
+                existing = pd.read_excel("nssf_records.xlsx", sheet_name="Members")
                 updated = pd.concat([existing, new_row], ignore_index=True)
-            except Exception:
+            except Exception as e:
+                st.error(f"Could not read existing file: {e}")
                 updated = new_row
 
-            with pd.ExcelWriter("nssf_records.xlsx", engine="openpyxl",
-                                mode="w") as writer:
+            with pd.ExcelWriter("nssf_records.xlsx", engine="openpyxl", mode="w") as writer:
                 updated.to_excel(writer, sheet_name="Members", index=False)
 
             st.success(f"Member {name} registered successfully!")
             st.table(new_row[["member_id", "name", "employer",
                                "gross_salary", "total_employee",
                                "total_employer", "net_pay"]])
-            
-
-
-
