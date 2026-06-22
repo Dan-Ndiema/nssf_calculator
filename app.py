@@ -233,10 +233,18 @@ elif page == "Member Registration":
                 st.error(f"Could not read existing file: {e}")
                 updated = new_row
 
-            with pd.ExcelWriter("nssf_records.xlsx", engine="openpyxl", mode="w") as writer:
-                updated.to_excel(writer, sheet_name="Members", index=False)
-
-            st.success(f"Member {name} registered successfully!")
-            st.table(new_row[["member_id", "name", "employer",
+            try:
+                with pd.ExcelWriter("nssf_records.xlsx", engine="openpyxl", mode="w") as writer:
+                    updated.to_excel(writer, sheet_name="Members", index=False)
+                st.success(f"Member {name} registered successfully!")
+                st.table(new_row[["member_id", "name", "employer",
+                                   "gross_salary", "total_employee",
+                                   "total_employer", "net_pay"]])
+            except Exception as e:
+                st.error(f"Could not save file: {e}")
+            except PermissionError:
+                st.error("Could not save — please close nssf_records.xlsx if it's open in Excel, then try again.")
+                st.success(f"Member {name} registered successfully!")
+                st.table(new_row[["member_id", "name", "employer",
                                "gross_salary", "total_employee",
                                "total_employer", "net_pay"]])
